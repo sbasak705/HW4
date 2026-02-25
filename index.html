@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My First Map</title>
+    <title>Tables</title>
 
      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
@@ -19,33 +19,59 @@
 
 
 </head>
-<body>
 
-    <div id="mapid"></div>
-    <style>
-        #mapid{width:900px; height: 500px;}
-    </style>
+<body>
+    <table id="eqTable">
+        <tr>
+            <th>Location</th>
+            <th>Date</th>
+            <th>Magnitude</th>
+        </tr>
+    </table>
 
     <script>
-        var map = L.map("mapid").setView([38.348082, -100.771618], 4.45);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map)
-        
 
-         //L.geoJSON(green_level_hs).addTo(map);;
-         var HSicon = L.icon({
-            iconUrl: "https://creazilla-store.fra1.digitaloceanspaces.com/icons/3219541/earthquake-icon-md.png", 
-            iconSize: [25,25],
-            popupAnchor: [0, 0]
-        });
-
-        var customPopup = "<h1>Hurricane Sergio</h1><img src='https://zoom.earth/assets/images/storms/2048/2018/sergio.jpg' width='100' height='100'><p>2018</p>";
-
-        L.geoJSON(data, {
-            pointToLayer: function(feature, latlng){
-                return L.marker(latlng, {icon: HSicon});
-            }
-        }).bindPopup(customPopup).addTo(map);
-    </script>
     
+        var myTable = document.getElementById("eqTable")
+
+    function eqTable(feature){
+
+        var myRow = document.createElement("tr")
+
+        var myCell1 = document.createElement("td")  // Location
+        var myCell2 = document.createElement("td")  // Date
+        var myCell3 = document.createElement("td")  // Magnitude
+
+        var location = feature.properties.place
+        var magnitude = feature.properties.mag
+        var date = new Date(feature.properties.time)
+
+        myCell1.innerHTML = location
+        myCell2.innerHTML = date.toLocaleDateString()
+        myCell3.innerHTML = magnitude
+
+        if (magnitude >= 4.5) {
+            myRow.style.backgroundColor = "red"
+        } 
+        else if (magnitude >= 4.0) {
+            myRow.style.backgroundColor = "orange"
+        } 
+        else if (magnitude >= 3.0) {
+            myRow.style.backgroundColor = "yellow"
+        } 
+        else {
+            myRow.style.backgroundColor = "lightgreen"
+        }
+
+        myRow.append(myCell1)
+        myRow.append(myCell2)
+        myRow.append(myCell3)
+
+        myTable.append(myRow)
+    }
+
+    data.features.forEach(e => eqTable(e))
+        
+        
+    </script>
 </body>
-</html>
