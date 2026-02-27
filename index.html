@@ -36,12 +36,8 @@
         });
 
         var customPopup = "<h1>Hurricane Sergio</h1><img src='https://zoom.earth/assets/images/storms/2048/2018/sergio.jpg' width='100' height='100'><p>2018</p>";
-
-        L.geoJSON(data, {
-            pointToLayer: function(feature, latlng){
-                return L.marker(latlng, {icon: HSicon});
-            }
-        }).bindPopup(customPopup).addTo(map);
+        
+        
     </script>
     
 </body>
