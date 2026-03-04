@@ -1,44 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My First Map</title>
+<meta charset="UTF-8">
+<title>Earthquakes</title>
 
-     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./earthquakes.js"></script>
 
-     <script src="./earthquakes.js"></script>
-
-
-
-
+<style>
+    #mapid {
+        height: 600px;
+        width: 100%;
+    }
+    #controls {
+        width: 80%;
+        margin: auto;
+        text-align: center;
+    }
+</style>
 </head>
+
 <body>
 
-   
+<h1 style="text-align:center;">Earthquakes</h1>
+<div id="mapid"></div>
+<div id="controls">
+    <input type="range" min="1" value="1" id="myRange">
+    <p id="demo"></p>
+</div>
 
-    <script>
-        var map = L.map("mapid").setView([38.348082, -100.771618], 4.45);
+<script>
+
+
+
+var map = L.map("mapid").setView([38.348082, -100.771618], 4.45);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map)
-        
 
-         //L.geoJSON(green_level_hs).addTo(map);;
-         var HSicon = L.icon({
-            iconUrl: "https://creazilla-store.fra1.digitaloceanspaces.com/icons/3219541/earthquake-icon-md.png", 
-            iconSize: [25,25],
-            popupAnchor: [0, 0]
-        });
+data.features.sort(function(a, b) {
+    return a.properties.time - b.properties.time;
+});
 
-        var customPopup = "<h1>Hurricane Sergio</h1><img src='https://zoom.earth/assets/images/storms/2048/2018/sergio.jpg' width='100' height='100'><p>2018</p>";
-        
-        
-    </script>
-    
+var earthquakeLayer = L.geoJSON(data.features[0], {
+    pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, {
+            radius: feature.properties.mag * 2,
+            fillOpacity: 0.6
+        }).bindPopup(
+            "Location: " + feature.properties.place +
+            "<br>Date: " + new Date(feature.properties.time).toLocaleDateString() +
+            "<br>Magnitude: " + feature.properties.mag
+        );
+    }
+}).addTo(map);
+
+var slider = document.getElementById("myRange");
+var output = document.getElementById("demo");
+slider.max = data.features.length;
+output.innerHTML =
+    new Date(data.features[0].properties.time)
+    .toLocaleDateString();
+
+slider.oninput = function() {
+    var index = Number(this.value);
+    output.innerHTML =
+        new Date(data.features[index - 1].properties.time)
+        .toLocaleDateString();
+
+    map.removeLayer(earthquakeLayer);
+
+    earthquakeLayer = L.geoJSON(
+        data.features.slice(0, index),
+        {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                    radius: feature.properties.mag * 2,
+                    fillOpacity: 0.6
+                }).bindPopup(
+                    "Location: " + feature.properties.place +
+                    "<br>Date: " + new Date(feature.properties.time).toLocaleDateString() +
+                    "<br>Magnitude: " + feature.properties.mag
+                );
+            }
+        }
+    );
+
+    map.addLayer(earthquakeLayer);
+};
+
+window.onload = function() {
+    slider.value = 1;
+};
+
+</script>
+
 </body>
 </html>
